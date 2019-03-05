@@ -12,9 +12,6 @@ version = "0.1.0"
 
 
 def read(*rnames):
-    """
-    Reads file
-    """
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 
