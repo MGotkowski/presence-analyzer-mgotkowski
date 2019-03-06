@@ -4,6 +4,8 @@ Helper functions used in views.
 """
 
 import csv
+import logging
+
 from json import dumps
 from functools import wraps
 from datetime import datetime
@@ -12,21 +14,21 @@ from flask import Response
 
 from presence_analyzer.main import app
 
-import logging
+
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
-def jsonify(function):
+def jsonify(wrapped):
     """
     Creates a response with the JSON representation of wrapped function result.
     """
-    @wraps(function)
+    @wraps(wrapped)
     def inner(*args, **kwargs):
         """
         This docstring will be overridden by @wraps decorator.
         """
         return Response(
-            dumps(function(*args, **kwargs)),
+            dumps(wrapped(*args, **kwargs)),
             mimetype='application/json'
         )
     return inner
@@ -92,7 +94,7 @@ def seconds_since_midnight(time):
 
 def interval(start, end):
     """
-    Calculates inverval in seconds between two datetime.time objects.
+    Calculates interval in seconds between two datetime.time objects.
     """
     return seconds_since_midnight(end) - seconds_since_midnight(start)
 
@@ -101,4 +103,4 @@ def mean(items):
     """
     Calculates arithmetic mean. Returns zero for empty lists.
     """
-    return float(sum(items)) / len(items) if len(items) > 0 else 0
+    return float(sum(items)) / len(items) if items else 0

@@ -1,5 +1,11 @@
-from setuptools import setup, find_packages
+"""
+Presence analyzer setup
+"""
+
 import os
+
+from setuptools import setup, find_packages
+
 
 name = "presence_analyzer"
 version = "0.1.0"
