@@ -94,6 +94,15 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         self.assertEqual(0, mean([]))
         self.assertEqual(5, mean([1, 2, 3, 4, 5]))
 
+    def test_interval(self):
+        """
+        Test interval() function.
+        """
+        interval = utils.interval
+        start = datetime.time(11, 30, 0)
+        end = datetime.time(12, 30, 0)
+        self.assertEqual(3600, interval(start, end))
+
 
 def suite():
     """
