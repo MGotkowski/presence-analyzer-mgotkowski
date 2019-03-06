@@ -86,6 +86,14 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
             datetime.time(9, 39, 5)
         )
 
+    def test_mean(self):
+        """
+        Test mean() function.
+        """
+        mean = utils.mean
+        self.assertEqual(0, mean([]))
+        self.assertEqual(5, mean([1, 2, 3, 4]))
+
 
 def suite():
     """
