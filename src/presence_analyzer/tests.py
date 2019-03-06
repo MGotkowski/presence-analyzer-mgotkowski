@@ -103,6 +103,14 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         end = datetime.time(12, 30, 0)
         self.assertEqual(3600, interval(start, end))
 
+    def test_seconds_since_midnight(self):
+        """
+        Test seconds_since_midnight() function.
+        """
+        calc_sec = utils.seconds_since_midnight
+        time = datetime.time(1, 1, 1)
+        self.assertEqual(3661, calc_sec(time))
+
 
 def suite():
     """
