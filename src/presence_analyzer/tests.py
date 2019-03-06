@@ -92,7 +92,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         mean = utils.mean
         self.assertEqual(0, mean([]))
-        self.assertEqual(5, mean([1, 2, 3, 4]))
+        self.assertEqual(5, mean([1, 2, 3, 4, 5]))
 
 
 def suite():
