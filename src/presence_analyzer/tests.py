@@ -111,6 +111,15 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         time = datetime.time(1, 1, 1)
         self.assertEqual(3661, calc_sec(time))
 
+    def test_group_by_weekday(self):
+        """
+        Test assigning time to weekdays
+        """
+        group_by_weekday = utils.group_by_weekday
+        data = utils.get_data()
+        result = [[], [30047], [24465], [23705], [], [], []]
+        self.assertEqual(result, group_by_weekday(data[10]))
+
 
 def suite():
     """
