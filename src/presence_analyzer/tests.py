@@ -132,7 +132,8 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         pass
 
-    def test_get_data(self):
+    @patch("presence_analyzer.utils.log")
+    def test_get_data(self, mock_log):
         """
         Test parsing of CSV file.
         """
@@ -146,6 +147,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
             data[10][sample_date]['start'],
             datetime.time(9, 39, 5)
         )
+        self.assertTrue(mock_log.debug.called)
 
     def test_mean(self):
         """
