@@ -73,6 +73,13 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         self.assertEqual(len(data), 7)
         self.assertListEqual(data, result)
 
+    def test_api_mean_time_weekday_wrong_data(self):
+        """
+        Test mean presence time for user that is not in data
+        """
+        resp = self.client.get('/api/v1/mean_time_weekday/1')
+        self.assertEqual(resp.status_code, 404)
+
     def test_api_presence_weekday(self):
         """
         Test presence time by weekday for one user
@@ -93,6 +100,13 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
             ["Sun", 0]
         ]
         self.assertListEqual(data, result)
+
+    def test_api_presence_weekday_wrong_data(self):
+        """
+        Test presence time by weekday for user that is not in data.
+        """
+        resp = self.client.get('/api/v1/presence_weekday/1')
+        self.assertEqual(resp.status_code, 404)
 
 
 class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
