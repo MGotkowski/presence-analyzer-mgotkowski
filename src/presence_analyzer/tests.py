@@ -7,7 +7,9 @@ import json
 import datetime
 import unittest
 
-from presence_analyzer import main, utils
+from mock import patch
+
+from presence_analyzer import main, utils, views
 
 
 TEST_DATA_CSV = os.path.join(
@@ -73,11 +75,13 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         self.assertEqual(len(data), 7)
         self.assertListEqual(data, result)
 
-    def test_api_mean_time_weekday_wrong_data(self):
+    @patch("presence_analyzer.views.log")
+    def test_api_mean_time_weekday_wrong_data(self, mock_log):
         """
         Test mean presence time for user that is not in data
         """
         resp = self.client.get('/api/v1/mean_time_weekday/1')
+        self.assertTrue(mock_log.debug.called)
         self.assertEqual(resp.status_code, 404)
 
     def test_api_presence_weekday(self):
@@ -101,11 +105,13 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         ]
         self.assertListEqual(data, result)
 
-    def test_api_presence_weekday_wrong_data(self):
+    @patch("presence_analyzer.views.log")
+    def test_api_presence_weekday_wrong_data(self, mock_log):
         """
         Test presence time by weekday for user that is not in data.
         """
         resp = self.client.get('/api/v1/presence_weekday/1')
+        self.assertTrue(mock_log.debug.called)
         self.assertEqual(resp.status_code, 404)
 
 
