@@ -64,18 +64,18 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         self.assertEqual(resp.content_type, 'application/json')
         data = json.loads(resp.data)
         result = [
-            ["Mon", 0],
-            ["Tue", 30047],
-            ["Wed", 24465],
-            ["Thu", 23705],
-            ["Fri", 0],
-            ["Sat", 0],
-            ["Sun", 0]
+            ['Mon', 0],
+            ['Tue', 30047],
+            ['Wed', 24465],
+            ['Thu', 23705],
+            ['Fri', 0],
+            ['Sat', 0],
+            ['Sun', 0]
         ]
         self.assertEqual(len(data), 7)
         self.assertListEqual(data, result)
 
-    @patch("presence_analyzer.views.log")
+    @patch('presence_analyzer.views.log')
     def test_api_mean_time_weekday_wrong_data(self, mock_log):
         """
         Test mean presence time for user that is not in data
@@ -94,18 +94,18 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         data = json.loads(resp.data)
         self.assertEqual(len(data), 8)
         result = [
-            ["Weekday", "Presence (s)"],
-            ["Mon", 0],
-            ["Tue", 30047],
-            ["Wed", 24465],
-            ["Thu", 23705],
-            ["Fri", 0],
-            ["Sat", 0],
-            ["Sun", 0]
+            ['Weekday', 'Presence (s)'],
+            ['Mon', 0],
+            ['Tue', 30047],
+            ['Wed', 24465],
+            ['Thu', 23705],
+            ['Fri', 0],
+            ['Sat', 0],
+            ['Sun', 0]
         ]
         self.assertListEqual(data, result)
 
-    @patch("presence_analyzer.views.log")
+    @patch('presence_analyzer.views.log')
     def test_api_presence_weekday_wrong_data(self, mock_log):
         """
         Test presence time by weekday for user that is not in data.
@@ -132,7 +132,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         pass
 
-    @patch("presence_analyzer.utils.log")
+    @patch('presence_analyzer.utils.log')
     def test_get_data(self, mock_log):
         """
         Test parsing of CSV file.
