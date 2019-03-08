@@ -72,7 +72,6 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
             ['Sat', 0],
             ['Sun', 0]
         ]
-        self.assertEqual(len(data), 7)
         self.assertListEqual(data, result)
 
     @patch('presence_analyzer.views.log')
@@ -92,7 +91,6 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.content_type, 'application/json')
         data = json.loads(resp.data)
-        self.assertEqual(len(data), 8)
         result = [
             ['Weekday', 'Presence (s)'],
             ['Mon', 0],
@@ -153,35 +151,30 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         Test mean() function.
         """
-        mean = utils.mean
-        self.assertEqual(0, mean([]))
-        self.assertEqual(3, mean([1, 2, 3, 4, 5]))
+        self.assertEqual(0, utils.mean([]))
+        self.assertEqual(3, utils.mean([1, 2, 3, 4, 5]))
 
     def test_interval(self):
         """
         Test interval() function.
         """
-        interval = utils.interval
         start = datetime.time(11, 30, 0)
         end = datetime.time(12, 30, 0)
-        self.assertEqual(3600, interval(start, end))
+        self.assertEqual(3600, utils.interval(start, end))
 
     def test_seconds_since_midnight(self):
         """
         Test seconds_since_midnight() function.
         """
-        calc_sec = utils.seconds_since_midnight
         time = datetime.time(1, 1, 1)
-        self.assertEqual(3661, calc_sec(time))
+        self.assertEqual(3661, utils.seconds_since_midnight(time))
 
     def test_group_by_weekday(self):
         """
         Test assigning time to weekdays
         """
-        group_by_weekday = utils.group_by_weekday
-        data = utils.get_data()
         result = [[], [30047], [24465], [23705], [], [], []]
-        self.assertEqual(result, group_by_weekday(data[10]))
+        self.assertEqual(result, utils.group_by_weekday(utils.get_data()[10]))
 
 
 def suite():
