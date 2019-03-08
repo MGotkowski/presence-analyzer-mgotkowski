@@ -196,8 +196,19 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         Test assigning time to weekdays
         """
-        result = [[], [30047], [24465], [23705], [], [], []]
-        self.assertEqual(result, utils.group_by_weekday(utils.get_data()[10]))
+        fake_data = {
+            datetime.date(2019, 3, 4): {
+                'start': datetime.time(9, 0, 0),
+                'end': datetime.time(17, 30, 0),
+            },
+            datetime.date(2019, 3, 5): {
+                'start': datetime.time(8, 30, 0),
+                'end': datetime.time(16, 45, 0),
+            },
+        }
+        result = [[30600], [29700], [], [], [], [], []]
+
+        self.assertEqual(result, utils.group_by_weekday(fake_data))
 
 
 def suite():
