@@ -158,9 +158,22 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         Test interval() function.
         """
-        start = datetime.time(11, 30, 0)
-        end = datetime.time(12, 30, 0)
-        self.assertEqual(3600, utils.interval(start, end))
+        self.assertEqual(
+            3600,
+            utils.interval(datetime.time(11, 30, 0), datetime.time(12, 30, 0))
+        )
+        self.assertEqual(
+            0,
+            utils.interval(datetime.time(7, 7, 7), datetime.time(7, 7, 7))
+        )
+        self.assertEqual(
+            86399,
+            utils.interval(datetime.time(0, 0, 0), datetime.time(23, 59, 59))
+        )
+        self.assertEqual(
+            3539,
+            utils.interval(datetime.time(12, 59, 59), datetime.time(13, 58, 58))
+        )
 
     def test_seconds_since_midnight(self):
         """
