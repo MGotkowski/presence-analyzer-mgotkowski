@@ -166,8 +166,18 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         Test seconds_since_midnight() function.
         """
-        time = datetime.time(1, 1, 1)
-        self.assertEqual(3661, utils.seconds_since_midnight(time))
+        self.assertEqual(
+            3661,
+            utils.seconds_since_midnight(datetime.time(1, 1, 1))
+        )
+        self.assertEqual(
+            0,
+            utils.seconds_since_midnight(datetime.time(0, 0, 0))
+        )
+        self.assertEqual(
+            86399,
+            utils.seconds_since_midnight(datetime.time(23, 59, 59))
+        )
 
     def test_group_by_weekday(self):
         """
