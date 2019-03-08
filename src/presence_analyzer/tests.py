@@ -16,6 +16,10 @@ TEST_DATA_CSV = os.path.join(
     os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'test_data.csv'
 )
 
+MALF_DATA_CSV = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'malformed_data.csv'
+)
+
 
 # pylint: disable=maybe-no-member, too-many-public-methods
 class PresenceAnalyzerViewsTestCase(unittest.TestCase):
@@ -130,8 +134,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         pass
 
-    @patch('presence_analyzer.utils.log')
-    def test_get_data(self, mock_log):
+    def test_get_data(self):
         """
         Test parsing of CSV file.
         """
@@ -145,7 +148,15 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
             data[10][sample_date]['start'],
             datetime.time(9, 39, 5)
         )
-        self.assertTrue(mock_log.debug.called)
+
+    @patch('presence_analyzer.utils.log')
+    def test_malformed_get_data(self, mock_log):
+        """
+        Test get_data() with malformed data
+        """
+        with patch.dict(main.app.config, {'DATA_CSV': MALF_DATA_CSV}):
+            utils.get_data()
+            self.assertTrue(mock_log.debug.called)
 
     def test_mean(self):
         """
