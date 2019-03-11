@@ -149,14 +149,14 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
             datetime.time(9, 39, 5)
         )
 
+    @patch.dict('presence_analyzer.main.app.config', {'DATA_CSV': MALF_DATA_CSV})
     @patch('presence_analyzer.utils.log')
     def test_malformed_get_data(self, mock_log):
         """
         Test get_data() with malformed data
         """
-        with patch.dict(main.app.config, {'DATA_CSV': MALF_DATA_CSV}):
-            utils.get_data()
-            self.assertTrue(mock_log.debug.called)
+        utils.get_data()
+        self.assertTrue(mock_log.debug.called)
 
     def test_mean(self):
         """
