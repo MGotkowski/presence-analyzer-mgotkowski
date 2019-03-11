@@ -8,7 +8,7 @@ import logging
 
 from json import dumps
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import Response
 
@@ -85,6 +85,32 @@ def group_by_weekday(items):
     return result
 
 
+def group_start_end_by_weekday(items):
+    """
+    Groups mean start and mean end times by weekday.
+
+    Returns [mean start, mean end] in (s) for each weekday
+    """
+    # one list for every day in week, two lists for start time and end times for a day
+    weekdays = [
+        ([], [])
+        for i in range(7)
+    ]
+
+    for date in items:
+        start = items[date]['start']
+        end = items[date]['end']
+        weekdays[date.weekday()][0].append(seconds_since_midnight(start))
+        weekdays[date.weekday()][1].append(seconds_since_midnight(end))
+
+    result = [
+        [int(mean(day[0])), int(mean(day[1]))]
+        for day in weekdays
+    ]
+
+    return result
+
+
 def seconds_since_midnight(time):
     """
     Calculates amount of seconds since midnight.
@@ -104,3 +130,4 @@ def mean(items):
     Calculates arithmetic mean. Returns zero for empty lists.
     """
     return float(sum(items)) / len(items) if items else 0
+
