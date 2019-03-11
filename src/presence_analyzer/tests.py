@@ -7,11 +7,17 @@ import json
 import datetime
 import unittest
 
-from presence_analyzer import main, utils
+from mock import patch
+
+from presence_analyzer import main, utils, views
 
 
 TEST_DATA_CSV = os.path.join(
     os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'test_data.csv'
+)
+
+MALF_DATA_CSV = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'malformed_data.csv'
 )
 
 
@@ -53,6 +59,63 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         self.assertEqual(len(data), 2)
         self.assertDictEqual(data[0], {u'user_id': 10, u'name': u'User 10'})
 
+    def test_api_mean_time_weekday(self):
+        """
+        Test mean presence time result by weekday for one user
+        """
+        resp = self.client.get('/api/v1/mean_time_weekday/10')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content_type, 'application/json')
+        data = json.loads(resp.data)
+        result = [
+            ['Mon', 0],
+            ['Tue', 30047],
+            ['Wed', 24465],
+            ['Thu', 23705],
+            ['Fri', 0],
+            ['Sat', 0],
+            ['Sun', 0]
+        ]
+        self.assertListEqual(data, result)
+
+    @patch('presence_analyzer.views.log')
+    def test_api_mean_time_weekday_wrong_data(self, mock_log):
+        """
+        Test mean presence time for user that is not in data
+        """
+        resp = self.client.get('/api/v1/mean_time_weekday/1')
+        self.assertTrue(mock_log.debug.called)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_api_presence_weekday(self):
+        """
+        Test presence time by weekday for one user
+        """
+        resp = self.client.get('/api/v1/presence_weekday/10')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content_type, 'application/json')
+        data = json.loads(resp.data)
+        result = [
+            ['Weekday', 'Presence (s)'],
+            ['Mon', 0],
+            ['Tue', 30047],
+            ['Wed', 24465],
+            ['Thu', 23705],
+            ['Fri', 0],
+            ['Sat', 0],
+            ['Sun', 0]
+        ]
+        self.assertListEqual(data, result)
+
+    @patch('presence_analyzer.views.log')
+    def test_api_presence_weekday_wrong_data(self, mock_log):
+        """
+        Test presence time by weekday for user that is not in data.
+        """
+        resp = self.client.get('/api/v1/presence_weekday/1')
+        self.assertTrue(mock_log.debug.called)
+        self.assertEqual(resp.status_code, 404)
+
 
 class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
     """
@@ -85,6 +148,78 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
             data[10][sample_date]['start'],
             datetime.time(9, 39, 5)
         )
+
+    @patch.dict('presence_analyzer.main.app.config', {'DATA_CSV': MALF_DATA_CSV})
+    @patch('presence_analyzer.utils.log')
+    def test_malformed_get_data(self, mock_log):
+        """
+        Test get_data() with malformed data
+        """
+        utils.get_data()
+        self.assertTrue(mock_log.debug.called)
+
+    def test_mean(self):
+        """
+        Test mean() function.
+        """
+        self.assertEqual(0, utils.mean([]))
+        self.assertEqual(3, utils.mean([1, 2, 3, 4, 5]))
+
+    def test_interval(self):
+        """
+        Test interval() function.
+        """
+        self.assertEqual(
+            3600,
+            utils.interval(datetime.time(11, 30, 0), datetime.time(12, 30, 0))
+        )
+        self.assertEqual(
+            0,
+            utils.interval(datetime.time(7, 7, 7), datetime.time(7, 7, 7))
+        )
+        self.assertEqual(
+            86399,
+            utils.interval(datetime.time(0, 0, 0), datetime.time(23, 59, 59))
+        )
+        self.assertEqual(
+            3539,
+            utils.interval(datetime.time(12, 59, 59), datetime.time(13, 58, 58))
+        )
+
+    def test_seconds_since_midnight(self):
+        """
+        Test seconds_since_midnight() function.
+        """
+        self.assertEqual(
+            3661,
+            utils.seconds_since_midnight(datetime.time(1, 1, 1))
+        )
+        self.assertEqual(
+            0,
+            utils.seconds_since_midnight(datetime.time(0, 0, 0))
+        )
+        self.assertEqual(
+            86399,
+            utils.seconds_since_midnight(datetime.time(23, 59, 59))
+        )
+
+    def test_group_by_weekday(self):
+        """
+        Test assigning time to weekdays
+        """
+        fake_data = {
+            datetime.date(2019, 3, 4): {
+                'start': datetime.time(9, 0, 0),
+                'end': datetime.time(17, 30, 0),
+            },
+            datetime.date(2019, 3, 5): {
+                'start': datetime.time(8, 30, 0),
+                'end': datetime.time(16, 45, 0),
+            },
+        }
+        result = [[30600], [29700], [], [], [], [], []]
+
+        self.assertEqual(result, utils.group_by_weekday(fake_data))
 
 
 def suite():
