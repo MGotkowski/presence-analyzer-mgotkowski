@@ -61,7 +61,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
 
     def test_api_mean_time_weekday(self):
         """
-        Test mean presence time result by weekday for one user
+        Test mean presence time result by weekday for one user.
         """
         resp = self.client.get('/api/v1/mean_time_weekday/10')
         self.assertEqual(resp.status_code, 200)
@@ -81,7 +81,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
     @patch('presence_analyzer.views.log')
     def test_api_mean_time_weekday_wrong_data(self, mock_log):
         """
-        Test mean presence time for user that is not in data
+        Test mean presence time for user that is not in data.
         """
         resp = self.client.get('/api/v1/mean_time_weekday/1')
         self.assertTrue(mock_log.debug.called)
@@ -89,7 +89,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
 
     def test_api_presence_weekday(self):
         """
-        Test presence time by weekday for one user
+        Test presence time by weekday for one user.
         """
         resp = self.client.get('/api/v1/presence_weekday/10')
         self.assertEqual(resp.status_code, 200)
@@ -114,6 +114,32 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         """
         resp = self.client.get('/api/v1/presence_weekday/1')
         self.assertTrue(mock_log.debug.called)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_api_presence_start_end(self):
+        """
+        Test presence start and end time by weekday for one user.
+        """
+        resp = self.client.get('/api/v1/presence_start_end/11')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content_type, 'application/json')
+        data = json.loads(resp.data)
+        result = [
+            ['Mon', 33134, 57257],
+            ['Tue', 33590, 50154],
+            ['Wed', 33206, 58527],
+            ['Thu', 35602, 58586],
+            ['Fri', 47816, 54242],
+        ]
+        self.assertEqual(data, result)
+
+    @patch('presence_analyzer.views.log')
+    def test_api_presence_start_end_wrong_data(self, mock_log):
+        """
+        Test presence start and end time by weekday for user that is not in data.
+        """
+        resp = self.client.get('/api/v1/presence_start_end/1')
+        mock_log.debug.assert_called_with('User %s not found!', 1)
         self.assertEqual(resp.status_code, 404)
 
 
@@ -153,7 +179,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
     @patch('presence_analyzer.utils.log')
     def test_malformed_get_data(self, mock_log):
         """
-        Test get_data() with malformed data
+        Test get_data() with malformed data.
         """
         utils.get_data()
         self.assertTrue(mock_log.debug.called)
@@ -205,7 +231,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
 
     def test_group_by_weekday(self):
         """
-        Test assigning time to weekdays
+        Test assigning time to weekdays.
         """
         fake_data = {
             datetime.date(2019, 3, 4): {
@@ -220,6 +246,37 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         result = [[30600], [29700], [], [], [], [], []]
 
         self.assertEqual(result, utils.group_by_weekday(fake_data))
+
+    def test_group_start_end_by_weekday(self):
+        """
+        Test assigning mean start and end time to weekdays.
+        """
+        fake_data = {
+            datetime.date(2019, 3, 4): {
+                'start': datetime.time(9, 0, 0),
+                'end': datetime.time(17, 30, 0),
+            },
+            datetime.date(2019, 3, 5): {
+                'start': datetime.time(8, 30, 0),
+                'end': datetime.time(16, 45, 0),
+            },
+            datetime.date(2019, 3, 11): {
+                'start': datetime.time(8, 30, 0),
+                'end': datetime.time(16, 45, 0),
+            },
+        }
+
+        result = [
+            [31500, 61650],
+            [30600, 60300],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+        ]
+
+        self.assertEqual(result, utils.group_start_end_by_weekday(fake_data))
 
 
 def suite():

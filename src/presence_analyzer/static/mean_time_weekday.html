@@ -106,7 +106,6 @@
                             $.each(result, function(index, value) {
                                 value[1] = parseInterval(value[1]);
                             });
-                            console.log(result);
                             var data = new google.visualization.DataTable();
                             data.addColumn('string', 'Weekday');
                             data.addColumn('datetime', 'Mean time (h:m:s)');
@@ -138,6 +137,8 @@
             <ul>
                 <li><a href="/static/presence_weekday.html">Presence by weekday</a></li>
                 <li id="selected"><a href="/static/mean_time_weekday.html">Presence mean time</a></li>
+                <li><a href="/static/presence_start_end.html">Presence start-end</a></li>
+
             </ul>
         </div>
         <div id="content">
