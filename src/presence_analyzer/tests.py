@@ -38,7 +38,6 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         """
         Get rid of unused objects after each test.
         """
-        pass
 
     def test_mainpage(self):
         """
@@ -46,7 +45,23 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         """
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 302)
-        assert resp.headers['Location'].endswith('/presence_weekday.html')
+        assert resp.headers['Location'].endswith('/presence_weekday')
+
+    def test_template_router(self):
+        """
+        Test template_router redirect.
+        """
+        resp = self.client.get('/presence_weekday')
+        self.assertEqual(resp.status_code, 200)
+        source = resp.get_data()
+        self.assertIn('<h2>Presence by weekday</h2>', source)
+
+    def test_template_router_wrong_url(self):
+        """
+        Test template_router for incorrect url.
+        """
+        resp = self.client.get('/wrong_url')
+        self.assertEqual(resp.status_code, 404)
 
     def test_api_users(self):
         """

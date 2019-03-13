@@ -8,7 +8,7 @@ import logging
 
 from json import dumps
 from functools import wraps
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from flask import Response
 
@@ -130,4 +130,3 @@ def mean(items):
     Calculates arithmetic mean. Returns zero for empty lists.
     """
     return float(sum(items)) / len(items) if items else 0
-
