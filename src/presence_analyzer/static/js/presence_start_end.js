@@ -19,10 +19,8 @@ google.load("visualization", "1", {packages:["corechart", "timeline"], 'language
                 chart_div.hide();
                 $.getJSON("/api/v1/presence_start_end/"+selected_user, function(result) {
                     $.each(result, function(index, value){
-                        $.getScript('/js/utils.js', function() {
-                            value[1] = parseInterval(value[1]);
-                            value[2] = parseInterval(value[2]);
-                        });
+                        value[1] = parseInterval(value[1]);
+                        value[2] = parseInterval(value[2]);
                     });
                     var data = new google.visualization.DataTable();
                     data.addColumn('string', 'Weekday');
