@@ -16,6 +16,7 @@ from presence_analyzer.utils import (
     mean,
     group_by_weekday,
     group_start_end_by_weekday,
+    get_xml_users,
 )
 
 
@@ -28,19 +29,6 @@ def mainpage():
     Redirects to front page.
     """
     return redirect('/presence_weekday')
-
-
-@app.route('/api/v1/users', methods=['GET'])
-@jsonify
-def users_view():
-    """
-    Users listing for dropdown.
-    """
-    data = get_data()
-    return [
-        {'user_id': i, 'name': 'User {0}'.format(str(i))}
-        for i in data
-    ]
 
 
 @app.route('/api/v1/mean_time_weekday/<int:user_id>', methods=['GET'])
@@ -108,9 +96,26 @@ def presence_start_end_view(user_id):
 @app.route('/<path:path>')
 def template_router(path):
     """
-    Render template according to given url
+    Render template according to given url.
     """
     try:
         return render_template(path + '.html')
     except exceptions.TemplateLookupException:
         return abort(404)
+
+
+@app.route('/api/v1/users_data', methods=['GET'])
+@jsonify
+def users_data_view():
+    """
+    Returns users id, name and avatar.
+    """
+    data = get_xml_users()
+
+    return [
+        {
+            'user_id': user,
+            'name': data[user]['name'],
+            'avatar': '/static/img/user_avatars/{}.png'.format(user)}
+        for user in data
+    ]

@@ -30,6 +30,15 @@ MALF_DATA_CSV = os.path.join(
     'malformed_data.csv'
 )
 
+TEST_DATA_XML = os.path.join(
+    os.path.dirname(__file__),
+    '..',
+    '..',
+    'runtime',
+    'data',
+    'test_users.xml'
+)
+
 
 # pylint: disable=maybe-no-member, too-many-public-methods
 class PresenceAnalyzerViewsTestCase(unittest.TestCase):
@@ -42,6 +51,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         Before each test, set up a environment.
         """
         main.app.config.update({'DATA_CSV': TEST_DATA_CSV})
+        main.app.config.update({'DATA_XML': TEST_DATA_XML})
         self.client = main.app.test_client()
 
     def tearDown(self):
@@ -73,16 +83,23 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         resp = self.client.get('/wrong_url')
         self.assertEqual(resp.status_code, 404)
 
-    def test_api_users(self):
+    def test_api_users_data(self):
         """
-        Test users listing.
+        Test users data listing.
         """
-        resp = self.client.get('/api/v1/users')
+        resp = self.client.get('/api/v1/users_data')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.content_type, 'application/json')
         data = json.loads(resp.data)
-        self.assertEqual(len(data), 2)
-        self.assertDictEqual(data[0], {u'user_id': 10, u'name': u'User 10'})
+        self.assertEqual(len(data), 5)
+        self.assertDictEqual(
+            data[0],
+            {
+                'user_id': 1,
+                'name': 'Adam A.',
+                'avatar': '/static/img/user_avatars/1.png',
+            }
+        )
 
     def test_api_mean_time_weekday(self):
         """
@@ -179,6 +196,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         Before each test, set up a environment.
         """
         main.app.config.update({'DATA_CSV': TEST_DATA_CSV})
+        main.app.config.update({'DATA_XML': TEST_DATA_XML})
 
     def tearDown(self):
         """
@@ -212,6 +230,23 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         utils.get_data()
         self.assertTrue(mock_log.debug.called)
+
+    def test_get_xml_users(self):
+        """
+        Test parsing of xml file.
+        """
+        data = utils.get_xml_users()
+        self.assertIsInstance(data, dict)
+        self.assertItemsEqual(data.keys(), range(1, 6))
+        self.assertEqual(len(data), 5)
+
+        self.assertEqual(
+            data[1],
+            {
+                'name': 'Adam A.',
+                'avatar': 'http://127.0.0.1:5000/api/images/users/1',
+            }
+        )
 
     def test_mean(self):
         """

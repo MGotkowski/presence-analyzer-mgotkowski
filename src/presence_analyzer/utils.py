@@ -9,6 +9,7 @@ import logging
 from json import dumps
 from functools import wraps
 from datetime import datetime
+import xml.etree.cElementTree as etree
 
 from flask import Response
 
@@ -91,7 +92,7 @@ def group_start_end_by_weekday(items):
 
     Returns [mean start, mean end] in (s) for each weekday
     """
-    # one list for every day in week, two lists for start time and end times for a day
+    # one list for every day in week, two lists for start and end times by day
     weekdays = [
         ([], [])
         for i in range(7)
@@ -130,3 +131,34 @@ def mean(items):
     Calculates arithmetic mean. Returns zero for empty lists.
     """
     return float(sum(items)) / len(items) if items else 0
+
+
+def get_xml_users():
+    """
+    Extracts users data from xml file and groups it by id.
+
+    It creates structure like this:
+    data = {
+        'user_id': {
+            'name': 'Anna K.',
+            'avatar': intranet.stxnext.pl/api/images/users/176,
+        }
+        'user_id': {
+            'name': 'Jan N.',
+            'avatar': intranet.stxnext.pl/api/images/users/16,
+        }
+    }
+    """
+    xml_data = etree.parse(app.config['DATA_XML'])
+    xml_data = xml_data.getroot()
+    users = xml_data[1]
+    host = xml_data[0][0].text
+    data = {}
+    for user in users:
+        user_id = int(user.get('id'))
+        avatar = user[0].text
+        name = user[1].text
+
+        data[user_id] = {'name': name, 'avatar': host + avatar}
+
+    return data
