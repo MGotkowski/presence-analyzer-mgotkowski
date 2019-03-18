@@ -13,11 +13,21 @@ from presence_analyzer import main, utils, views
 
 
 TEST_DATA_CSV = os.path.join(
-    os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'test_data.csv'
+    os.path.dirname(__file__),
+    '..',
+    '..',
+    'runtime',
+    'data',
+    'test_data.csv'
 )
 
 MALF_DATA_CSV = os.path.join(
-    os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'malformed_data.csv'
+    os.path.dirname(__file__),
+    '..',
+    '..',
+    'runtime',
+    'data',
+    'malformed_data.csv'
 )
 
 
@@ -151,7 +161,8 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
     @patch('presence_analyzer.views.log')
     def test_api_presence_start_end_wrong_data(self, mock_log):
         """
-        Test presence start and end time by weekday for user that is not in data.
+        Test presence start and end time by weekday
+        for user that is not in data.
         """
         resp = self.client.get('/api/v1/presence_start_end/1')
         mock_log.debug.assert_called_with('User %s not found!', 1)
@@ -190,7 +201,10 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
             datetime.time(9, 39, 5)
         )
 
-    @patch.dict('presence_analyzer.main.app.config', {'DATA_CSV': MALF_DATA_CSV})
+    @patch.dict(
+        'presence_analyzer.main.app.config',
+        {'DATA_CSV': MALF_DATA_CSV}
+    )
     @patch('presence_analyzer.utils.log')
     def test_malformed_get_data(self, mock_log):
         """
@@ -212,19 +226,31 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         self.assertEqual(
             3600,
-            utils.interval(datetime.time(11, 30, 0), datetime.time(12, 30, 0))
+            utils.interval(
+                datetime.time(11, 30, 0),
+                datetime.time(12, 30, 0)
+            )
         )
         self.assertEqual(
             0,
-            utils.interval(datetime.time(7, 7, 7), datetime.time(7, 7, 7))
+            utils.interval(
+                datetime.time(7, 7, 7),
+                datetime.time(7, 7, 7)
+            )
         )
         self.assertEqual(
             86399,
-            utils.interval(datetime.time(0, 0, 0), datetime.time(23, 59, 59))
+            utils.interval(
+                datetime.time(0, 0, 0),
+                datetime.time(23, 59, 59)
+            )
         )
         self.assertEqual(
             3539,
-            utils.interval(datetime.time(12, 59, 59), datetime.time(13, 58, 58))
+            utils.interval(
+                datetime.time(12, 59, 59),
+                datetime.time(13, 58, 58)
+            )
         )
 
     def test_seconds_since_midnight(self):

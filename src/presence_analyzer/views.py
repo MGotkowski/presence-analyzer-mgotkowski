@@ -6,8 +6,8 @@ Defines views.
 import calendar
 import logging
 
-from flask import redirect, abort, render_template
-from jinja2.exceptions import TemplateNotFound
+from flask import redirect, abort
+from flask_mako import render_template, exceptions
 
 from presence_analyzer.main import app
 from presence_analyzer.utils import (
@@ -112,5 +112,5 @@ def template_router(path):
     """
     try:
         return render_template(path + '.html')
-    except TemplateNotFound:
+    except exceptions.TemplateLookupException:
         return abort(404)
