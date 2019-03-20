@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<intranet>
+    <server>
+        <host>http://127.0.0.1:5000</host>
+    </server>
+    <users>
+        <user id="1">
+            <avatar>/api/images/users/1</avatar>
+            <name>Adam A.</name>
+        </user>
+        <user id="2">
+            <avatar>/api/images/users/2</avatar>
+            <name>Adam B.</name>
+        </user>
+        <user id="3">
+            <avatar>/api/images/users/3</avatar>
+            <name>Adam C.</name>
+        </user>
+        <user id="4">
+            <avatar>/api/images/users/4</avatar>
+            <name>Adam D.</name>
+        </user>
+        <user id="5">
+            <avatar>/api/images/users/5</avatar>
+            <name>Adam E.</name>
+        </user>
+    </users>
+</intranet>
