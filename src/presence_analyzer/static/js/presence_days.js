@@ -9,6 +9,9 @@ function getDate(value) {
         var loading = $('#loading');
         $.getJSON("/api/v1/users_data", function(result) {
             var dropdown = $("#user_id");
+            result.sort(function(a, b) {
+                return (a.name).localeCompare((b.name));
+            });
             $.each(result, function(item) {
                 dropdown.append($("<option />").val(this.user_id).text(this.name).attr('avatar', this.avatar));
             });
