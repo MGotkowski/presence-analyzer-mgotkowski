@@ -185,6 +185,32 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         mock_log.debug.assert_called_with('User %s not found!', 1)
         self.assertEqual(resp.status_code, 404)
 
+    def test_api_days_of_presence(self):
+        """
+        Test days of presence for one user.
+        """
+        resp = self.client.get('/api/v1/presence_days/10')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content_type, 'application/json')
+        data = json.loads(resp.data)
+        result = [
+            ['2013-09-10', 500],
+            ['2013-09-11', 407],
+            ['2013-09-12', 395],
+        ]
+
+        for _ in result:
+            self.assertIn(_, data)
+
+    @patch('presence_analyzer.views.log')
+    def test_api_days_of_presence_wrong_data(self, mock_log):
+        """
+        Test days of presence for a user that is not in data.
+        """
+        resp = self.client.get('/api/v1/presence_days/1')
+        mock_log.debug.assert_called_with('User %s not found!', 1)
+        self.assertEqual(resp.status_code, 404)
+
 
 class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
     """
@@ -377,6 +403,34 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
             dt.now.return_value = now + datetime.timedelta(seconds=60)
             wrapped(1)
             self.assertEqual(moc.call_count, 3)
+
+    def test_time_spent_by_day(self):
+        """
+        Test result of time_spent_by_day().
+        """
+        fake_data = {
+            datetime.date(2019, 3, 4): {
+                'start': datetime.time(9, 0, 0),
+                'end': datetime.time(17, 30, 0),
+            },
+            datetime.date(2019, 3, 5): {
+                'start': datetime.time(8, 30, 0),
+                'end': datetime.time(16, 45, 0),
+            },
+            datetime.date(2019, 3, 11): {
+                'start': datetime.time(8, 30, 0),
+                'end': datetime.time(16, 45, 0),
+            },
+        }
+        result_data = utils.time_spent_by_day(fake_data)
+
+        result = [
+            ['2019-03-04', 510],
+            ['2019-03-05', 495],
+            ['2019-03-11', 495]
+        ]
+        for _ in result:
+            self.assertIn(_, result_data)
 
 
 def suite():
