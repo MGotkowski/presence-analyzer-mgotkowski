@@ -18,9 +18,10 @@ function getDate(value) {
         $('#user_id').change(function(){
             var selected_user = $("#user_id").val();
             var chart_div = $('#chart_div');
+            var user_img = $('#user_img');
             if(selected_user) {
                 var avatar = $('option:selected').attr('avatar');
-                $('#user_img').attr("src", avatar);
+                user_img.attr("src", avatar);
                 loading.show();
                 chart_div.hide();
                 $.getJSON("/api/v1/presence_days/"+selected_user, function(result) {
@@ -39,11 +40,16 @@ function getDate(value) {
                     var date_formatter = new google.visualization.DateFormat({pattern: 'dd-MM-yyyy'});
                     date_formatter.format(data, 0);
 
+                    user_img.show();
                     chart_div.show();
                     loading.hide();
                     var chart = new google.visualization.Calendar(chart_div[0]);
                     chart.draw(data, options);
                 });
+            }
+            else {
+                user_img.hide();
+                chart_div.hide();
             }
         });
     });
