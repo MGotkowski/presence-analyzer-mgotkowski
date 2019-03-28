@@ -7,7 +7,7 @@ import json
 import datetime
 import unittest
 
-from mock import patch
+from mock import patch, MagicMock
 
 from presence_analyzer import main, utils, views
 
@@ -195,6 +195,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         Before each test, set up a environment.
         """
+        reload(utils)  # cache-cleaning
         main.app.config.update({'DATA_CSV': TEST_DATA_CSV})
         main.app.config.update({'DATA_XML': TEST_DATA_XML})
 
@@ -353,6 +354,29 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         ]
 
         self.assertEqual(result, utils.group_start_end_by_weekday(fake_data))
+
+    def test_cache_decorator(self):
+        """
+        Test utils/cache result
+        """
+        moc = MagicMock()
+        _func = lambda _: moc()
+        cachelimit = 10
+
+        wrapped = utils.cache(cachelimit)(_func)
+
+        wrapped(1)
+        wrapped(2)
+        self.assertEqual(moc.call_count, 2)
+
+        wrapped(1)
+        self.assertEqual(moc.call_count, 2)
+
+        with patch('presence_analyzer.utils.datetime') as dt:
+            now = datetime.datetime.now()
+            dt.now.return_value = now + datetime.timedelta(seconds=60)
+            wrapped(1)
+            self.assertEqual(moc.call_count, 3)
 
 
 def suite():
