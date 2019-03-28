@@ -194,3 +194,19 @@ def get_xml_users():
         data[user_id] = {'name': name, 'avatar': host + avatar}
 
     return data
+
+
+def time_spent_by_day(items):
+    """
+    Calculate time of presence grouped by day.
+    """
+    result = []
+    for date in items:
+        day = str(date)
+        start = items[date]['start']
+        end = items[date]['end']
+        result.append([
+            day,
+            interval(start, end) / 60,
+        ])
+    return result

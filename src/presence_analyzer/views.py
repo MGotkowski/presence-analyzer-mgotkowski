@@ -17,6 +17,7 @@ from presence_analyzer.utils import (
     group_by_weekday,
     group_start_end_by_weekday,
     get_xml_users,
+    time_spent_by_day,
 )
 
 
@@ -119,3 +120,17 @@ def users_data_view():
             'avatar': '/static/img/user_avatars/{}.png'.format(user)}
         for user in data
     ]
+
+
+@app.route('/api/v1/presence_days/<int:user_id>', methods=['GET'])
+@jsonify
+def presence_days_view(user_id):
+    """
+    Creates list of presence days during a year for a user.
+    """
+    data = get_data()
+    if user_id not in data:
+        log.debug('User %s not found!', user_id)
+        abort(404)
+
+    return time_spent_by_day(data[user_id])
