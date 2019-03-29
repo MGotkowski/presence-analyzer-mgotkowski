@@ -4,6 +4,9 @@ google.load("visualization", "1", {packages:["corechart", "timeline"], 'language
     $(document).ready(function(){
         var loading = $('#loading');
         $.getJSON("/api/v1/users_data", function(result) {
+            result.sort(function(a, b) {
+                return (a.name).localeCompare((b.name));
+            });
             var dropdown = $("#user_id");
             $.each(result, function(item) {
                 dropdown.append($("<option />").val(this.user_id).text(this.name).attr('avatar', this.avatar));

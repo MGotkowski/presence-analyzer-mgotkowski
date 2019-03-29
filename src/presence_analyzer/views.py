@@ -117,7 +117,8 @@ def users_data_view():
         {
             'user_id': user,
             'name': data[user]['name'],
-            'avatar': '/static/img/user_avatars/{}.png'.format(user)}
+            'avatar': '/static/img/user_avatars/{}.png'.format(user)
+        }
         for user in data
     ]
 

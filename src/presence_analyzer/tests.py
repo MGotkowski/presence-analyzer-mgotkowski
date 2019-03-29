@@ -98,7 +98,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
                 'user_id': 1,
                 'name': 'Adam A.',
                 'avatar': '/static/img/user_avatars/1.png',
-            }
+            },
         )
 
     def test_api_mean_time_weekday(self):
