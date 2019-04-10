@@ -22,6 +22,7 @@ google.load("visualization", "1", {packages:["corechart"], 'language': 'en'});
             if(selected_user) {
                 var avatar = $('option:selected').attr('avatar');
                 user_img.attr("src", avatar);
+                user_img.show();
                 loading.show();
                 chart_div.hide();
                 no_data.hide();
@@ -29,7 +30,6 @@ google.load("visualization", "1", {packages:["corechart"], 'language': 'en'});
                     var data = google.visualization.arrayToDataTable(result);
                     var options = {};
                     chart_div.show();
-                    user_img.show();
                     loading.hide();
                     var chart = new google.visualization.PieChart(chart_div[0]);
                     chart.draw(data, options);
@@ -44,6 +44,7 @@ google.load("visualization", "1", {packages:["corechart"], 'language': 'en'});
             else{
                 user_img.hide();
                 chart_div.hide();
+                no_data.hide();
             }
         });
     });

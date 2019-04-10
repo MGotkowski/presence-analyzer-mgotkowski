@@ -22,6 +22,7 @@ google.load("visualization", "1", {packages:["corechart"], 'language': 'pl'});
             if(selected_user) {
                 var avatar = $('option:selected').attr('avatar');
                 user_img.attr("src", avatar);
+                user_img.show();
                 loading.show();
                 chart_div.hide();
                 no_data.hide();
@@ -39,7 +40,6 @@ google.load("visualization", "1", {packages:["corechart"], 'language': 'pl'});
                     var formatter = new google.visualization.DateFormat({pattern: 'HH:mm:ss'});
                     formatter.format(data, 1);
 
-                    user_img.show();
                     chart_div.show();
                     loading.hide();
                     var chart = new google.visualization.ColumnChart(chart_div[0]);
@@ -55,6 +55,7 @@ google.load("visualization", "1", {packages:["corechart"], 'language': 'pl'});
             else {
                 user_img.hide();
                 chart_div.hide();
+                no_data.hide();
             }
         });
     });
