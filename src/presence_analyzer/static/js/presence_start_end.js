@@ -22,6 +22,7 @@ google.load("visualization", "1", {packages:["corechart", "timeline"], 'language
             if(selected_user) {
                 var avatar = $('option:selected').attr('avatar');
                 user_img.attr("src", avatar);
+                user_img.show();
                 loading.show();
                 chart_div.hide();
                 no_data.hide();
@@ -42,7 +43,6 @@ google.load("visualization", "1", {packages:["corechart", "timeline"], 'language
                     formatter.format(data, 1);
                     formatter.format(data, 2);
 
-                    user_img.show();
                     chart_div.show();
                     loading.hide();
                     var chart = new google.visualization.Timeline(chart_div[0]);
@@ -58,6 +58,7 @@ google.load("visualization", "1", {packages:["corechart", "timeline"], 'language
             else {
                 user_img.hide();
                 chart_div.hide();
+                no_data.hide();
             }
         });
     });
