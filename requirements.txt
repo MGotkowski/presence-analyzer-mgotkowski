@@ -1,3 +1,4 @@
 Flask==1.0.2
 Flask-Mako==0.4
 Werkzeug==0.14.1
+celery==4.3.0
