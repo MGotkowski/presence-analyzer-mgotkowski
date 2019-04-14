@@ -174,10 +174,12 @@ def get_xml_users():
         'user_id': {
             'name': 'Anna K.',
             'avatar': intranet.stxnext.pl/api/images/users/176,
+            'email': 'anna_k@myapp.com'
         }
         'user_id': {
             'name': 'Jan N.',
             'avatar': intranet.stxnext.pl/api/images/users/16,
+            'email': 'jan_n@myapp.com'
         }
     }
     """
@@ -190,9 +192,13 @@ def get_xml_users():
         user_id = int(user.get('id'))
         avatar = user[0].text
         name = user[1].text
+        email = user[2].text
 
-        data[user_id] = {'name': name, 'avatar': host + avatar}
-
+        data[user_id] = {
+            'name': name,
+            'avatar': host + avatar,
+            'email': email,
+        }
     return data
 
 
@@ -209,4 +215,20 @@ def time_spent_by_day(items):
             day,
             interval(start, end) / 60,
         ])
+    return result
+
+
+def total_presence_time():
+    """
+    Calculates total time of presence in year 2013 for each user.
+    """
+    data = get_data()
+    result = {user: 0 for user in data}
+
+    for user in data:
+        for date in data[user]:
+            if date.year == 2013:
+                start = data[user][date]['start']
+                end = data[user][date]['end']
+                result[user] += interval(start, end)
     return result

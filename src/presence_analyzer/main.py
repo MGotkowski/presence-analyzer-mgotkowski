@@ -5,7 +5,6 @@ Flask app initialization.
 import os.path
 from flask import Flask
 from flask_mako import MakoTemplates
-from celery import Celery
 
 MAIN_DATA_CSV = os.path.join(
     os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'sample_data.csv'
@@ -24,6 +23,3 @@ app.config.update(
 )
 
 mako = MakoTemplates(app)
-
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-celery.conf.update(app.config)

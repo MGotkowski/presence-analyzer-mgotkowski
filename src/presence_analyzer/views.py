@@ -18,6 +18,7 @@ from presence_analyzer.utils import (
     group_start_end_by_weekday,
     get_xml_users,
     time_spent_by_day,
+    total_presence_time,
 )
 
 
@@ -117,7 +118,8 @@ def users_data_view():
         {
             'user_id': user,
             'name': data[user]['name'],
-            'avatar': '/static/img/user_avatars/{}.png'.format(user)
+            'avatar': '/static/img/user_avatars/{}.png'.format(user),
+            'email': data[user]['email']
         }
         for user in data
     ]
@@ -135,3 +137,14 @@ def presence_days_view(user_id):
         abort(404)
 
     return time_spent_by_day(data[user_id])
+
+
+@app.route('/api/v1/mean', methods=['GET'])
+@jsonify
+def total_presence_time_view():
+    """
+    Creates sorted list of total presence time in year 2013 for each user.
+    """
+    data = total_presence_time()
+
+    return sorted(data.items(), key=lambda kv: kv[1])
