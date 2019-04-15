@@ -18,7 +18,7 @@ from presence_analyzer.utils import (
     group_start_end_by_weekday,
     get_xml_users,
     time_spent_by_day,
-    total_presence_time,
+    mean_work_time,
 )
 
 
@@ -139,12 +139,21 @@ def presence_days_view(user_id):
     return time_spent_by_day(data[user_id])
 
 
-@app.route('/api/v1/mean', methods=['GET'])
+@app.route('/api/v1/mean_work_time', methods=['GET'])
 @jsonify
-def total_presence_time_view():
+def mean_work_time_view():
     """
-    Creates sorted list of total presence time in year 2013 for each user.
+    Creates sorted list of mean work time in year 2013 for users that work for at least 4 months.
     """
-    data = total_presence_time()
+    data = mean_work_time()
+
+    data = {
+        user: round(
+            sum(data[user]) / 3600.0 / 189,  # time in (s) / seconds in a hour / workdays for 01-09.2013
+            2
+        )
+        for user in data
+        if data[user].count(0) < 4  # people that work for more than 4 months
+    }
 
     return sorted(data.items(), key=lambda kv: kv[1])

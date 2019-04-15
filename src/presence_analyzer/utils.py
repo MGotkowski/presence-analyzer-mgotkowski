@@ -13,11 +13,14 @@ from functools import wraps
 from datetime import datetime, timedelta
 
 from flask import Response
+from flask_mail import Mail, Message
 
 from presence_analyzer.main import app
 
 
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+mail = Mail(app)
 
 
 def jsonify(wrapped):
@@ -218,17 +221,32 @@ def time_spent_by_day(items):
     return result
 
 
-def total_presence_time():
+def mean_work_time():
     """
     Calculates total time of presence in year 2013 for each user.
     """
     data = get_data()
-    result = {user: 0 for user in data}
+
+    result = {}
 
     for user in data:
+        months = [0 for _ in range(9)]  # each 0 for months 01-09.2013
+
         for date in data[user]:
             if date.year == 2013:
                 start = data[user][date]['start']
                 end = data[user][date]['end']
-                result[user] += interval(start, end)
+                months[date.month - 1] += interval(start, end)
+
+        result[user] = months
+
     return result
+
+
+def send_email_with_data(email, data):
+    msg = Message(
+        subject='Missing work hours.',
+        recipients=[email],
+        body="Your mean work hours is {}".format(data)
+    )
+    mail.send(msg)

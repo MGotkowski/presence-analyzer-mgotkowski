@@ -19,7 +19,16 @@ app.config.update(
     DEBUG=True,
     DATA_CSV=MAIN_DATA_CSV,
     DATA_XML=MAIN_DATA_XML,
+
     CELERY_BROKER_URL='amqp://localhost//',
+
+    MAIL_SERVER='',
+    MAIL_PORT=465,
+    MAIL_USERNAME='',
+    MAIL_PASSWORD='',
+    MAIL_USE_TLS=False,
+    MAIL_USE_SLL=True,
+    MAIL_DEFAULT_SENDER='',
 )
 
 mako = MakoTemplates(app)
