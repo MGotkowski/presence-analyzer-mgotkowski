@@ -20,15 +20,15 @@ app.config.update(
     DATA_CSV=MAIN_DATA_CSV,
     DATA_XML=MAIN_DATA_XML,
 
-    CELERY_BROKER_URL='amqp://localhost//',
+    # CELERY_BROKER_URL='amqp://localhost//',
 
-    MAIL_SERVER='',
+    MAIL_SERVER='poczta.o2.pl',
     MAIL_PORT=465,
-    MAIL_USERNAME='',
-    MAIL_PASSWORD='',
+    MAIL_USERNAME='myapp_stx@o2.pl',
+    MAIL_PASSWORD='lubieparufki',
     MAIL_USE_TLS=False,
     MAIL_USE_SLL=True,
-    MAIL_DEFAULT_SENDER='',
+    MAIL_DEFAULT_SENDER='myapp_stx@o2.pl',
 )
 
 mako = MakoTemplates(app)

@@ -149,11 +149,11 @@ def mean_work_time_view():
 
     data = {
         user: round(
-            sum(data[user]) / 3600.0 / 189,  # time in (s) / seconds in a hour / workdays for 01-09.2013
+            sum(data[user]) / 3600.0 / 189,  # time in (s) / seconds in an hour / workdays for 01-09.2013
             2
         )
         for user in data
-        if data[user].count(0) < 4  # people that work for more than 4 months
+        if data[user].count(0) < 4  # people that work for at least 4 months
     }
 
     return sorted(data.items(), key=lambda kv: kv[1])
