@@ -223,22 +223,53 @@ def time_spent_by_day(items):
 
 def mean_work_time():
     """
-    Calculates total time of presence in year 2013 for each user.
+    Creates a sorted list of mean work time in year 2013
+    for users that work for at least 4 months.
     """
     data = get_data()
 
-    result = {}
-
+    users_data = {}
     for user in data:
         months = [0 for _ in range(9)]  # each 0 for months 01-09.2013
-
         for date in data[user]:
             if date.year == 2013:
                 start = data[user][date]['start']
                 end = data[user][date]['end']
                 months[date.month - 1] += interval(start, end)
+        users_data[user] = months
 
-        result[user] = months
+    result = (
+        (
+            user,
+            # time in (s) / seconds in an hour / workdays for 01-09.2013
+            round(
+                sum(users_data[user]) / 3600.0 / 189,
+                2
+            )
+        )
+        for user in users_data
+        # people that work for at least 4 months
+        if users_data[user].count(0) < 4
+    )
+
+    return sorted(result, key=lambda v: v[1])
+
+
+def get_low_presence_users():
+    """
+
+    """
+    users_data = get_xml_users()
+    data = mean_work_time()
+
+    result = {
+        user: {
+            'mean_time': mean_time,
+            'email': users_data[user]['email']
+        }
+        for (user, mean_time) in data[:5]
+        if user in users_data
+    }
 
     return result
 

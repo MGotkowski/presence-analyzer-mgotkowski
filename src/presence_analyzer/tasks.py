@@ -7,7 +7,6 @@ from utils import send_email_with_data
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
-
 celery.conf.beat_schedule = {
     'mail_every_minute': {
         'task': 'main.send_email',

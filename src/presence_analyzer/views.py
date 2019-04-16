@@ -19,6 +19,7 @@ from presence_analyzer.utils import (
     get_xml_users,
     time_spent_by_day,
     mean_work_time,
+    get_low_presence_users,
 )
 
 
@@ -141,19 +142,18 @@ def presence_days_view(user_id):
 
 @app.route('/api/v1/mean_work_time', methods=['GET'])
 @jsonify
-def mean_work_time_view():
+def lowest_mean_work_time_view():
     """
-    Creates sorted list of mean work time in year 2013 for users that work for at least 4 months.
+    Returns 5 users with lowest mean work time
     """
     data = mean_work_time()
+    return [user for user, mean_time in data[:5]]
 
-    data = {
-        user: round(
-            sum(data[user]) / 3600.0 / 189,  # time in (s) / seconds in an hour / workdays for 01-09.2013
-            2
-        )
-        for user in data
-        if data[user].count(0) < 4  # people that work for at least 4 months
-    }
 
-    return sorted(data.items(), key=lambda kv: kv[1])
+@app.route('/api/v1/lowest', methods=['GET'])
+@jsonify
+def lowest():
+    """
+    Returns 5 users with lowest mean work time
+    """
+    return get_low_presence_users()
