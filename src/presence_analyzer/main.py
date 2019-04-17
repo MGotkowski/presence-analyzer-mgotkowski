@@ -12,7 +12,9 @@ MAIN_DATA_CSV = os.path.join(
 MAIN_DATA_XML = os.path.join(
     os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'users.xml'
 )
-
+DB = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'database.db'
+)
 
 app = Flask(__name__)  # pylint: disable=invalid-name
 app.config.update(
@@ -21,7 +23,7 @@ app.config.update(
     DATA_XML=MAIN_DATA_XML,
 
     # CELERY_BROKER_URL='amqp://localhost//',
-
+    DATABASE=DB,
     MAIL_SERVER='poczta.o2.pl',
     MAIL_PORT=465,
     MAIL_USERNAME='myapp_stx@o2.pl',

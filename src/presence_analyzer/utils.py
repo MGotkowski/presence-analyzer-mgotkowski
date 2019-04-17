@@ -2,7 +2,7 @@
 """
 Helper functions used in views.
 """
-
+import sqlite3
 import csv
 import logging
 import threading
@@ -11,6 +11,7 @@ import xml.etree.cElementTree as etree
 from json import dumps
 from functools import wraps
 from datetime import datetime, timedelta
+
 
 from flask import Response
 from flask_mail import Mail, Message
@@ -258,15 +259,29 @@ def get_low_presence_users():
     users_data = get_xml_users()
     data = mean_work_time()
 
-    result = {
-        user: {
-            'mean_time': mean_time,
-            'email': users_data[user]['email']
-        }
-        for (user, mean_time) in data[:5]
-        if user in users_data
-    }
+    result = {}
 
+    cnx = sqlite3.connect(app.config['DATABASE'])
+    cursor = cnx.cursor()
+
+    for (user, mean_time) in data[:5]:
+
+        if user in users_data:
+            result[user] = {
+                'mean_time': mean_time,
+                'email': users_data[user]['email'],
+            }
+            sent_date = datetime.now().date().strftime('%Y-%m-%d')
+
+            sql = """INSERT INTO mean_time(user_id, mean_time, email_sent) 
+            SELECT ?, ?, ?
+            WHERE NOT EXISTS(SELECT user_id FROM mean_time WHERE user_id=?)
+            """
+
+            cursor.execute(sql, (user, mean_time, sent_date, user))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
     return result
 
 
@@ -277,3 +292,27 @@ def send_email_with_data(email, data):
         body="Your mean work hours is {}".format(data)
     )
     mail.send(msg)
+
+
+def get_next_mail_time():
+    """
+
+    """
+    cnx = sqlite3.connect(app.config['DATABASE'])
+    cursor = cnx.cursor()
+    cursor.execute("SELECT user_id, email_sent FROM mean_time;")
+
+    result = {}
+
+    for user_id, email_sent in cursor:
+
+        email_sent = datetime.strptime(email_sent, '%Y-%m-%d').date()
+        next_mail = email_sent + timedelta(days=120)
+        days_to_next_mail = next_mail - datetime.now().date()
+
+        result[user_id] = days_to_next_mail.days
+
+    cursor.close()
+    cnx.close()
+
+    return result
