@@ -241,11 +241,7 @@ def mean_work_time():
     result = (
         (
             user,
-            # time in (s) / seconds in an hour / workdays for 01-09.2013
-            round(
-                sum(users_data[user]) / 3600.0 / 189,
-                2
-            )
+            sum(users_data[user]) / 189  # time in (s) / workdays for 01-09.2013
         )
         for user in users_data
         # people that work for at least 4 months
