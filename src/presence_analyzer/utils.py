@@ -14,14 +14,11 @@ from datetime import datetime, timedelta
 
 
 from flask import Response
-from flask_mail import Mail, Message
 
 from presence_analyzer.main import app
 
 
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
-
-mail = Mail(app)
 
 
 def jsonify(wrapped):
@@ -224,37 +221,41 @@ def time_spent_by_day(items):
 
 def mean_work_time():
     """
-    Creates a sorted list of mean work time in year 2013
-    for users that work for at least 4 months.
+    Returns 5 users that work for at least 4 months
+    with the lowest mean work time in 2013.
     """
     data = get_data()
 
     users_data = {}
     for user in data:
+
         months = [0 for _ in range(9)]  # each 0 for months 01-09.2013
         for date in data[user]:
+
             if date.year == 2013:
                 start = data[user][date]['start']
                 end = data[user][date]['end']
                 months[date.month - 1] += interval(start, end)
+
         users_data[user] = months
 
     result = (
         (
             user,
-            sum(users_data[user]) / 189  # time in (s) / workdays for 01-09.2013
+            sum(users_data[user]) / 189  # time(s) / workdays for 01-09.2013
         )
         for user in users_data
         # people that work for at least 4 months
         if users_data[user].count(0) < 4
     )
 
-    return sorted(result, key=lambda v: v[1])
+    return sorted(result, key=lambda v: v[1])[:5]
 
 
-def get_low_presence_users():
+def mails_handling():  # async task
     """
-
+    Deletes old data, returns users for sending emails
+    and adds them to the database.
     """
     users_data = get_xml_users()
     data = mean_work_time()
@@ -264,52 +265,53 @@ def get_low_presence_users():
     cnx = sqlite3.connect(app.config['DATABASE'])
     cursor = cnx.cursor()
 
-    for (user, mean_time) in data[:5]:
+    # delete old data
+    cursor.execute(
+        "DELETE FROM mean_time WHERE next_mail < ?",
+        (datetime.now().date().strftime('%Y-%m-%d'),)
+    )
 
-        if user in users_data:
+    # get users that already have received an email
+    cursor.execute("""SELECT user_id FROM mean_time""")
+    blocked_users = [user_id for (user_id,) in cursor]
+
+    # add users users that will receive an email to database
+    for (user, mean_time) in data:
+        if user in users_data and user not in blocked_users:
             result[user] = {
                 'mean_time': mean_time,
                 'email': users_data[user]['email'],
             }
-            sent_date = datetime.now().date().strftime('%Y-%m-%d')
 
-            sql = """INSERT INTO mean_time(user_id, mean_time, email_sent) 
+            next_mail = (
+                datetime.now().date() + timedelta(days=120)
+            ).strftime('%Y-%m-%d')
+            insert = """
+            INSERT INTO mean_time(user_id, mean_time, next_mail) 
             SELECT ?, ?, ?
             WHERE NOT EXISTS(SELECT user_id FROM mean_time WHERE user_id=?)
             """
 
-            cursor.execute(sql, (user, mean_time, sent_date, user))
+            cursor.execute(insert, (user, mean_time, next_mail, user))
+
     cnx.commit()
     cursor.close()
     cnx.close()
     return result
 
 
-def send_email_with_data(email, data):
-    msg = Message(
-        subject='Missing work hours.',
-        recipients=[email],
-        body="Your mean work hours is {}".format(data)
-    )
-    mail.send(msg)
-
-
-def get_next_mail_time():
+def get_sent_mails():
     """
-
+    Returns users and days left for sending next emails.
     """
     cnx = sqlite3.connect(app.config['DATABASE'])
     cursor = cnx.cursor()
-    cursor.execute("SELECT user_id, email_sent FROM mean_time;")
+    cursor.execute("SELECT user_id, next_mail FROM mean_time;")
 
     result = {}
-
-    for user_id, email_sent in cursor:
-
-        email_sent = datetime.strptime(email_sent, '%Y-%m-%d').date()
-        next_mail = email_sent + timedelta(days=120)
+    for user_id, next_mail in cursor:
+        next_mail = datetime.strptime(next_mail, '%Y-%m-%d').date()
         days_to_next_mail = next_mail - datetime.now().date()
-
         result[user_id] = days_to_next_mail.days
 
     cursor.close()

@@ -22,15 +22,20 @@ app.config.update(
     DATA_CSV=MAIN_DATA_CSV,
     DATA_XML=MAIN_DATA_XML,
 
-    # CELERY_BROKER_URL='amqp://localhost//',
+    CELERY_BROKER_URL='amqp://localhost//',
     DATABASE=DB,
     MAIL_SERVER='poczta.o2.pl',
-    MAIL_PORT=465,
+    MAIL_PORT=587,
     MAIL_USERNAME='myapp_stx@o2.pl',
     MAIL_PASSWORD='lubieparufki',
     MAIL_USE_TLS=False,
     MAIL_USE_SLL=True,
-    MAIL_DEFAULT_SENDER='myapp_stx@o2.pl',
 )
 
 mako = MakoTemplates(app)
+
+
+# sudo service rabbitmq-server restart
+# sudo rabbitmqctl status
+# celery -A tasks.celery worker --loglevel=info
+# celery -A tasks.celery beat
