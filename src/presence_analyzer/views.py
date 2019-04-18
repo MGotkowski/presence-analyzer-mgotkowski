@@ -18,9 +18,7 @@ from presence_analyzer.utils import (
     group_start_end_by_weekday,
     get_xml_users,
     time_spent_by_day,
-    mean_work_time,
-    mails_handling,
-    get_sent_mails,
+    get_mails_receivers,
 )
 
 
@@ -141,29 +139,10 @@ def presence_days_view(user_id):
     return time_spent_by_day(data[user_id])
 
 
-@app.route('/api/v1/mean_work_time', methods=['GET'])
+@app.route('/api/v1/mails_receivers', methods=['GET'])
 @jsonify
-def lowest_mean_work_time_view():
-    """
-    Returns 5 users with lowest mean work time
-    """
-    data = mean_work_time()
-    return [user for user, mean_time in data]
-
-
-# @app.route('/api/v1/lowest', methods=['GET'])
-# @jsonify
-# def lowest():
-#     """
-#     Returns 5 users with lowest mean work time
-#     """
-#     return mails_handling()
-
-
-@app.route('/api/v1/next_mails', methods=['GET'])
-@jsonify
-def next_mail():
+def mails_receivers():
     """
     Returns user_id with number of days to next mail.
     """
-    return get_sent_mails()
+    return get_mails_receivers()

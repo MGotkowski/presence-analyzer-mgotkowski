@@ -267,12 +267,12 @@ def mails_handling():  # async task
 
     # delete old data
     cursor.execute(
-        "DELETE FROM mean_time WHERE next_mail < ?",
+        'DELETE FROM mean_time WHERE next_mail < ?',
         (datetime.now().date().strftime('%Y-%m-%d'),)
     )
 
     # get users that already have received an email
-    cursor.execute("""SELECT user_id FROM mean_time""")
+    cursor.execute('SELECT user_id FROM mean_time')
     blocked_users = [user_id for (user_id,) in cursor]
 
     # add users users that will receive an email to database
@@ -286,11 +286,12 @@ def mails_handling():  # async task
             next_mail = (
                 datetime.now().date() + timedelta(days=120)
             ).strftime('%Y-%m-%d')
-            insert = """
+
+            insert = '''
             INSERT INTO mean_time(user_id, mean_time, next_mail) 
             SELECT ?, ?, ?
             WHERE NOT EXISTS(SELECT user_id FROM mean_time WHERE user_id=?)
-            """
+            '''
 
             cursor.execute(insert, (user, mean_time, next_mail, user))
 
@@ -300,13 +301,13 @@ def mails_handling():  # async task
     return result
 
 
-def get_sent_mails():
+def get_mails_receivers():
     """
     Returns users and days left for sending next emails.
     """
     cnx = sqlite3.connect(app.config['DATABASE'])
     cursor = cnx.cursor()
-    cursor.execute("SELECT user_id, next_mail FROM mean_time;")
+    cursor.execute('SELECT user_id, next_mail FROM mean_time;')
 
     result = {}
     for user_id, next_mail in cursor:
